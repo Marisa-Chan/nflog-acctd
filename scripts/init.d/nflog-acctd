@@ -1,4 +1,5 @@
 #! /bin/sh
+
 ### BEGIN INIT INFO
 # Provides:          nflog-acctd
 # Required-Start:    $remote_fs $syslog
@@ -7,9 +8,9 @@
 # Default-Stop:      0 1 6
 ### END INIT INFO
 
-PATH=/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=/usr/sbin/nflog-acctd
+PATH="/sbin:/bin:/usr/sbin:/usr/bin"
 NAME=nflog-acctd
+DAEMON="/usr/bin/$NAME"
 DESC="nflog-acctd net accounting daemon"
 
 test -x $DAEMON || exit 0
