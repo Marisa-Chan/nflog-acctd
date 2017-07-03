@@ -293,16 +293,10 @@ struct config *read_config(char *fname)
 	  cfg->pid_file=strdup(value);
 	  syslog(LOG_DEBUG,"config: set PID file to %s",cfg->dump_file);
 	}
-      else if(strcasecmp(key, "multicast groups")==0)
+      else if(strcasecmp(key, "nflog group")==0)
 	{
-	  tmpc=value;
-	  while((value=strtok(tmpc,",")))
-	    {
-	      cfg->mcast_group|=1<<(atoi(value)-1);
-	      syslog(LOG_DEBUG,"config: adding mcast group %u",atoi(value));
-	      tmpc=NULL;
-	    }
-	  syslog(LOG_DEBUG,"config: set multicast group to 0x%x",cfg->mcast_group);
+	  cfg->mcast_group = atoi(value);
+	  syslog(LOG_DEBUG,"config: set nflog group to %d",cfg->mcast_group);
 	}
       else if (strcasecmp(key, "empty interface")==0)
 	{

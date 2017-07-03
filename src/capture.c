@@ -120,10 +120,6 @@ void init_capture()
       DEBUG(DBG_ERR, my_sprintf("can't open nflog: %m"));
       daemon_stop(0);
     }
-  
-  nflog_bind_pf(nful_h, AF_INET);
-  nflog_bind_pf(nful_h, AF_INET6);
-  nflog_bind_pf(nful_h, AF_BRIDGE);
     
   /* bind to NFLOG target group */
   nful_gh = nflog_bind_group(nful_h, cfg->mcast_group);
