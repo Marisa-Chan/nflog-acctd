@@ -1,0 +1,15 @@
+/var/log/nflog-acctd/account.log /var/log/nflog-acctd/debug.log {
+	daily
+	missingok
+	rotate 14
+	compress
+	delaycompress
+	create 640 root adm
+	sharedscripts
+	prerotate
+		kill -TSTP `cat /var/run/nflog-acctd.pid`
+	endscript
+	postrotate
+		kill -CONT `cat /var/run/nflog-acctd.pid`
+	endscript
+}

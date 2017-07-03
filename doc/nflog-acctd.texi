@@ -1,0 +1,572 @@
+\input texinfo   @c -*-texinfo-*-
+@c $Id: nflog-acctd.texi,v 1.20 2005/02/03 09:32:33 bengen Exp $
+@c %**start of header
+@setfilename nflog-acctd.info
+@settitle @command{nflog-acctd} 0.4 Manual
+@c %**end of header
+
+@dircategory Net Utilities
+@direntry
+* nflog--acctd: (nflog--acctd).     A Network Accounting Daemon For Netfilter
+@end direntry
+
+@copying
+This manual is for @command{nflog-acctd}, version 0.4
+
+Copyright © 2002 Hilko Bengen
+
+@quotation
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@end quotation
+@end copying
+
+@titlepage
+@title nflog--acctd
+@subtitle A Network Accounting Daemon For Netfilter
+@author @email{bengen+nflog-acctd@@hilluzination.de, Hilko Bengen}
+
+@c  The following two commands
+@c  start the copyright page.
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+
+@end titlepage
+
+@contents
+
+@ifnottex
+@node Top
+@top TITLE
+
+@insertcopying
+@end ifnottex
+
+@menu
+* Overview::
+* Installation::
+* Configuration:: Setting things up
+* Running::       Using @command{nflog-acctd}
+* Credits::       Whom to complain to
+@c * Copying::          Your rights and freedoms.
+@c * GNU Free Documentation License::
+@end menu
+
+@node Overview
+@chapter Overview
+
+@command{nflog-acctd} is a userspace network accounting daemon which
+generates log files of network traffic for accounting purposes.
+
+@menu
+* Features::    What does @command{nflog-acctd} do?
+* Nonfeatures:: What does @command{nflog-acctd} not do?
+* Others::      Comparision with similar packages
+@end menu
+
+@node Features
+@section Features
+
+@command{nflog-acctd} collects headers of IP packets fhat travel through
+the Linux 2.4+ Netfilter framework. It writes accounting information to
+a log which can include
+
+@itemize @bullet
+@item
+protocol type,
+@item
+source and destination address, 
+@item
+port information,
+@item
+byte and packet count,
+@item
+incoming and outgoing network interfaces.
+@end itemize
+
+The log file format is configurable. For instance, it should be possible
+to directly generate files that contain SQL statements so that the raw
+accounting data can be fed into a DBMS.
+
+@node Nonfeatures
+@section Nonfeatures
+
+@command{nflog-acctd} only collects, aggregates, and logs the all data it
+is fed by netfilter. If only traffic for specific networks needs to be
+collected, selection for this should be done in the netfilter rulesets,
+as @command{nflog-acctd} has no way to ignore some packets and log
+others.
+
+@command{nflog-acctd} does not analyze them nor paint pretty pictures for
+traffic visualization. In the "one tool for one job" spirit of UNIX,
+Other tools should be used for these tasks.
+
+@node Others
+@section Others
+
+@menu
+* net--acct:: Ulrich Callmeier's net--acct
+* ipcad::    Lev Walkin's @command{ipcad}
+* traff::    Hans Marcus Krüger's @command{traff}
+* ipac--ng::  Moritz Both's and Al Zaharov's @command{ipac--ng}
+* ulogd2::
+@end menu
+
+@node net--acct
+@subsection net--acct
+
+@command{@command{net--acct}}
+(@url{http://exorsus.net/projects/net--acct/}) was developed by Ulrich
+Callmeier. The Mekafile hints that it can be used on Solaris (using
+libpcap). The Linux version uses the now obsolete packet interface at
+protocol level. (see @cite{ip(7)}).
+
+Information for net--acct is available at
+@url{http://www.exorsus.net/net--acct/}.
+
+I had tried to implement support for the newer packet interface at
+device level (supported since Linux kernel versions 2.2, see
+@cite{packet(7)}), but I found that it lost packets in high load
+situations. Patches against @command{net--acct} are available on request.
+
+@command{nflog-acctd} is based on @command{net--acct} and still shares
+some portions of the code. @command{net--acct} does not seem to be
+actively maintained any longer.
+
+@node ipcad
+@subsection ipcad
+
+@command{ipcad} stands for IP Cisco Accounting Daemon. It runs in
+background and listens traffic on the specified interfaces. Statistics
+are available through a Cisco--compatible rsh interface. @command{ipcad}
+can use the BPF interface or libpcap, which on Linux probably leads to
+packet less under high load, as described above.
+
+@command{ipcad} is available from
+@url{http://sourceforge.net/projects/ipcad}.
+
+It is certainly possible to set up a similar scenario with
+@command{nflog-acctd} with a small rsh daemon (or maybe just a shell
+script) which would emulate the relevant parts of Cisco command line
+syntax.
+
+@node traff
+@subsection traff
+
+@command{traff} (@url{http://sourceforge.net/projects/traff/}) is a
+program that attaches itself to one or more network interfaces, sniffs
+all IP-packages passing at it and accounts each packets size. The
+collected information can be dumped to an SQL database (PostgreSQL or
+MySQL), syslog or a file.
+
+Like @command{ipcad}, it uses libpcap.
+
+@node ipac--ng
+@subsection ipac--ng
+
+@command{ipac--ng} regularly reads byte and packet counters associated
+with the Linux kernel's packet filter rules and stores those numbers in
+a database. This works well for a small number of IP addresses / ports,
+but it does not scale well since one rule in the packet filter is needed
+for each possible entry.
+
+@node ulogd2
+@subsection ulogd2
+
+As the name suggests, @command{ulogd2} uses the same approach for
+collecting IP packets as @command{nflog-acctd} does. @command{ulogd2} can
+be extended through binary plugins for adding packet interpreters and
+output-targets (e.g. for logging into databases, user defined filetypes,
+etc.). It can be downloaded from
+@url{http://www2.kangran.su/~nnz/pub/nf-doc/ulogd2/}.
+
+@node Installation
+@chapter Installation
+
+@enumerate
+@item
+Compile the sources:
+@kbd{cd src; make}
+@item
+Generate the documentation from the Texinfo source (optional): 
+@kbd{cd doc; make nflog-acctd.info nflog-acctd.html nflog-acctd.dvi}
+@item
+Install the @file{nflog-acctd} binary into appropriate location, i.e.
+@file{/usr/local/sbin}. 
+@item
+Install the configuration file @file{src/nflog-acctd.conf} to @file{/etc}
+and edit it to your needs.
+@item
+Create the directories for logging that are referenced in the
+configuration file. (In the default configuration, this is
+@file{/var/log/nflog-acctd/}.)
+@end enumerate
+
+@node Configuration
+@chapter Configuration
+
+@menu
+* Netfilter::          Netfilter Configuration
+* nflog-acctd.conf::    @command{nflog-acctd} Configuration
+@end menu
+
+@node Netfilter
+@section Netfilter
+
+@command{nflog-acctd} relies on the kernel (more specific: Netfilter) to
+pipe the packet headers to user space. This has to be enabled by adding
+rules with the NFLOG target to packet filtering tables.
+
+The following example causes all packets that successfully pass the
+@option{FORWARD} table to be logged to @command{nflog-acctd}.
+
+@example
+@kbd{iptables --append FORWARD -j NFLOG --nflog-group 1 --nflog-range 48 --nflog-threshold 50 --nflog-prefix "FORWARD"}
+@end example
+
+Explaination:
+
+@itemize
+@item
+@option{-j NFLOG} causes the packet to passed to userspace in the first
+place.
+@item
+@option{--nflog-group @var{GROUP}} specifies thet the packet be sent to
+multicast group @var{GROUP}. @command{nflog-acctd} has to be configured
+to listen to this group.
+@item
+@option{--nflog-range @var{SIZE}} means that only the first @var{SIZE}
+bytes are copied to userspace. The default is to copy the whole packet,
+limiting the number of bytes should increase performance. However, when
+IP headers carry a lot of option fields, this may lead to the case that
+TCP, UDP, or ICMP headers are out of the copied range. If the
+@command{nflog-acctd} will log a warning "Short IP header. Increase copy
+range to @var{RANGE}" to to the system log as well as the debug log in
+this case.
+
+If the copy range is too small to even hold the IP address, an
+additional error message "copy range is too short to even capture IP
+headers. ALL IP PACKETS WILL BE DROPPED!" is logged.
+@item
+@option{--nflog-threshold @var{COUNT}} makes the kernel collect
+@var{COUNT} packets before sending the message containing these packets
+to userspace.
+@item
+@option{--nflog-prefix @var{PREFIX}} causes a prefix string (max. 32
+characters) to be passed along with the packet. This can for example be
+used for including hints for billing systems.
+@end itemize
+
+For further information, see @cite{iptables(8)}.
+
+@node nflog-acctd.conf
+@section nflog-acctd.conf
+Per default, configuration is done via the file
+@file{/etc/nflog-acctd.conf}. The following keywords are recognized:
+
+@itemize
+@item
+@command{multicast groups = @var{LIST}}: @var{LIST} is a comma-separated
+list of multicast groups that @command{nflog-acctd} should listen to. Possible
+values are 1-32.
+@item
+@command{socket receive buffer = @var{SIZE}}: The kernel's socket
+receive buffer will be set to @var{SIZE} bytes instead of the
+@command{net/core/rmem_default} kernel parameter's value. However, it
+can not be set to a value higher than the @command{net/core/rmem_max}
+kernel parameter. (Both of these kernel parameters are set to 64kBytes
+by the kernel, but can be canged with @cite{sysctl(8)}.
+@item
+@command{hash table size = @var{SIZE}}: @command{nflog-acctd} uses a hash
+table and linked lists to store the collected accounting data in memory. 
+@var{SIZE} should be set to a power of 2. The default value is 65536.
+
+This has changed in version 0.4.2
+@item
+@command{hash init value = @var{VALUE}}: This value is used as a "salt"
+to the hash function. Only set this if you know what you are doing. The
+default value is 0.
+@item
+@command{logger nice value = @var{VALUE}}: @command{nflog-acctd} forks
+off separate processes for writing accounting data to disk. The nice
+value of these processes are set to @var{VALUE}. It is probably not
+advisable to set @var{VALUE} to a negative number. By default, the nice
+value is not changed.
+@item
+@command{accounting file = @var{FILENAME}}, @command{dump file
+@var{FILENAME}}, @command{debug file = @var{FILENAME}}, @command{pid
+file = @var{FILENAME}}: Locations for the accounting file, dump file,
+debug log, pid file.
+@item
+@command{debug = @var{LIST}}: @var{LIST} is a comma-spearated list of
+debug message types. Valid debug message types are: @command{config},
+@command{state}, @command{syscall}, @command{misc},
+@command{statistics}, @command{signal}, @command{error},
+@command{annoying}, @command{error-packet}.
+@item
+@command{accounting format = @var{STRING}}: @var{STRING} is a format
+string with somewhat similar syntax to @cite{printf(3)}. The following
+directives are recognized and replaced in the output file.
+
+@table @samp
+@item %h
+hostname
+@item %x
+since (when the first packet of a chunk was recorded)
+@item %t
+till (when the last packet of a ckunk was recorded)
+@item %p
+protocol
+@item %s
+source IP
+@item %S
+source port
+@item %d
+destination IP
+@item %D
+destination port
+@item %P
+packets
+@item %b
+bytes
+@item %i
+incoming interface
+@item %o
+outgoing interface
+@item %r
+prefix
+@item %u
+Local user that owns a TCP connection
+@item %m
+MAC address, if any.
+@item %X
+formatted date string (since)
+@item %Z
+formatted date string (till), see below for defining the format. The time
+when the output is written is used for this.
+@item \t
+tab
+@item \n
+newline
+@item \\
+Literal \
+@item \"
+Literal "
+@item \%
+Literal %
+@item %% 
+Literal %
+@end table
+@item
+@command{date format = @var{STRING}} @var{STRING} is a format string for
+turning the date into a string. All the  directives that are known to
+@cite{strftime(3)} on your system are recognized.
+@emph{This option has changed in version 0.4 of @command{nflog-acctd}.}
+@item
+@command{empty interface = @var{STRING}}: If no incoming or outgoing
+interface is passed for a packet, insert @var{STRING} instead.
+@item
+@command{empty prefix = @var{STRING}}: If no NFLOG-prefix is passed for a
+packet, insert @var{STRING} instead.
+@item
+@command{flush = @var{TIME}}: The data that has been accumulated in a
+in-memory structure is written to the accounting file every @var{TIME}
+seconds.
+@item
+@command{fdelay = @var{TIME}}: A certain record of traffic information may
+be written out after @var{TIME} seconds. This helps making the logfiles
+smaller since only one output record will be generated for related
+traffic
+@end itemize
+
+Example:
+@example
+@verbatim
+multicast groups=1
+accounting file = /var/log/nflog-acctd/account.log
+dump file =       /var/log/nflog-acctd/dump
+debug file =      /var/log/nflog-acctd/debug.log
+debug = error
+accounting format = "%h\t%x\t%t\t%p\t%s\t%S\t%d\t%D\t%P\t%b\t\"%i\"\t\"%o\"\t\"%f\"\n"
+flush = 30
+fdelay = 30
+@end verbatim
+@end example
+
+The supplied accounting format string generates output records in the
+following form (all in one line, with a linefeed at the end):
+@verbatim
+judith	1032521450	1032521454	6	192.168.42.11	110	192.168.215.71	1546	12	250113	"eth0"	"eth1"	"prefix"
+@end verbatim
+
+The following format string will generate @sc{cisco} "ip accounting
+output-packets"-style output lines:
+@example
+@verbatim
+accounting format = "%s %d %P %b\n"
+@end verbatim
+@end example
+The lines will look like this:
+@example
+@verbatim
+192.168.42.11 192.168.215.71 12 250113
+@end verbatim
+@end example
+
+When not all types of information are collected, @command{nflog-acctd}
+will have to do fewer comparisions @emph{for each packet} while
+collecting data. Records are smaller and likely fewer records will be
+written out. This will be the case especially if port information are
+not collected.
+
+@node Running
+@chapter Running
+
+@menu
+* Invokation::         Running @command{nflog-acctd}
+* Signals::            @command{nflog-acctd} understands some signals
+* Rotating Log files::
+* Hints::
+@end menu
+
+@node Invokation
+@section Invokation
+
+@command{nflog-acctd} recognizes the following command-line parameters:
+
+@itemize
+@item @option{-d}
+Switch on debugging
+@item @option{-c}
+Specify alternative configuration file
+@item @option{-D}
+Don't detach from terminal
+@end itemize
+
+@node Signals
+@section Signals
+
+The following signals are recognized by  @command{nflog-acctd}:
+
+@table @samp
+@item SIGHUP
+causes the config file to be re-read.
+@item SIGTSTP
+causes @command{nflog-acctd} to stop writing to the accounting logfile
+@item SIGCONT
+causes @command{nflog-acctd} to re-open both debug and log file and
+resume writing to the account log.
+@item SIGIOT
+causes @command{nflog-acctd} to re-open the capture socket.
+@item SIGINT
+@item SIGTERM
+These signals stop the daemon, gracefully. The PID file is cleaned up
+and the IP data that is resident in memory is flushed to the accounting
+file.
+@item SIGKILL
+These signals stop the daemon.
+@item SIGALRM
+This is used internally. Do not send @command{nflog-acctd} this signal.
+@end table
+
+@node Rotating Log files
+@section Rotating Log files
+To cleanly rotate accounting log files, send @command{SIGTSTP} to the
+daemon, then move the logfiles out of the way, and finally send a
+@command{SIGCONT} to re-enable logging accounting data.
+
+Be sure @emph{not} to compress the log files immediately after rotating. 
+When the accounting log file is written to, the writing process will
+create a hard link to the accounting file and @command{gzip} and
+@command{bzip2} will not compress files with more than 1 link.
+
+@node Hints
+@section Hints
+
+@subsection High CPU load and "No buffer space available" messages
+
+This message in the debug log means that the kernel is delivering
+packets faster than @command{nflog-acctd} can process them. This happens
+most likely when @command{nflog-acctd} writes its accounting log to disk.
+
+There are a few steps that can be taken both in kernel space and in
+@command{nflog-acctd}.
+@enumerate
+@item
+Increase @command{socket receive buffer}. This requires that the kernel
+parameter @command{net/core/rmem_max} is set with @cite{sysctl(8)} to
+allow for a larger socket receive buffer.
+@item
+Increase @command{hash table size}. However, be sure that the size of
+the hash table is a prime number.
+@item
+Set a nice value for the child process that writes the account log.
+@item
+Increase the @command{--nflog-threshold} value, if approtpiate
+@item
+Decrease the @command{--nflog-range} value, if approtpiate. Experience
+shows that 24 to 32 bytes are enough for normal IP traffic.
+@end enumerate
+
+@subsection fdelay
+The @command{fdelay} configuration parameter can be used to reduce log
+file size where @command{nflog-acctd} is used to account many
+long-lasting connections and where it is not strictly necessary that the
+time values are absolutely correct.
+
+@subsection The dump file
+When @command{fdelay} is set to a non-zero value, @command{nflog-acctd}
+writes an additional dump file every time it writes to the accounting
+log. This dump file contains those records that have been kept in
+memory. If @command{nflog-acctd} crashes before writing to the accounting
+log file, these entries can still be recovered by the system
+administrator.
+
+@node Credits
+@chapter Credits
+
+@command{nflog-acctd} was written by
+@email{bengen+nflog-acctd@@hilluzination.de, Hilko Bengen}. Source
+tarballs and public CVS are accessible through
+@url{http://alioth.debian.org/projects/pkg-nflog-acctd}.
+
+@unnumberedsec Thanks go to
+@itemize @bullet
+@item
+Marc Haber, for many useful ideas, and for pointing me in the right
+direction at times.
+@item
+Fredrik Vang, for his code for formatted dates in log files.
+@item
+Ulrich Callmeier, for @command{net-acct} which gave me a good base to
+start my work on. If @command{nflog-acctd} does not work for you, don't
+blame Ulrich or any other contributors mentioned in the source files,
+though.
+@item
+Stefan Neufeind, for his useful ideas and data from operating
+@command{nflog-acctd} in environments with high network load. (traffic
+from game servers).
+@item
+Patrick Schaaf, for coming up with a quick solution to synchronization
+issues, in the @command{de.comp.os.unix.programing} newsgroup.
+@item
+Radek Podgorny, for his "since" patch, for logging the start of a flow.
+@end itemize
+
+Initial work (up to version 0.4.1) on this program was funded by
+toplink--plannet GmbH, Karlsruhe, Germany
+@url{http://www.toplink-plannet.de/}.
+
+@bye

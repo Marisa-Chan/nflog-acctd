@@ -1,0 +1,84 @@
+.\" (C) Copyright 2001 Alex King (alex@king.net.nz)
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this manual; if not, write to the Free
+.\" Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111,
+.\" USA.
+.\"
+.\" Fri Apr  6 01:27:28 NZST 2001 Alex King <alex@king.net.nz> initial release
+.\" Sat Apr  7 10:20:53 NZST 2001 Alex King <alex@king.net.nz> cleaned up
+.\" with the help of Colin Watson
+.\"
+.TH nflog-acctd 8 "16 Dec 2001"
+.SH NAME
+nflog-acctd \- network accounting daemon
+.SH SYNOPSIS
+.B nflog-acctd 
+.IB [ \-dD "] [" \-c " filename]"
+.SH DESCRIPTION
+.B nflog-acctd
+logs network traffic in a format suitable for generating billing
+information or usage statistics.
+.B nflog-acctd
+listens on network interfaces and periodically writes information
+to a log file.
+
+.B nflog-acctd
+is configured by editing its configuration file,
+.BR /etc/nflog-acctd.conf .
+
+.SH OPTIONS
+.TP
+.B -d
+This will let nflog-acctd run in debug mode
+.TP
+.B -D
+This will make nflog-acctd not to detach as a daemon, suitable for running it
+from inittab.
+.TP
+.B -c 
+.I configfile
+Specify the path of an alternative config file.
+
+.SH FILES
+.TP
+/etc/nflog-acctd.conf
+Configuration file
+.TP
+/var/log/nflog-acctd/account.log
+Default location for the main output file
+.TP
+/var/log/nflog-acctd/dump
+Default location for the dump of data not yet written to the main
+file.
+.SH "SEE ALSO"
+The full documentation for
+.B nflog-acctd
+is maintained as a Texinfo manual.  If the
+.B info
+and
+.B nflog-acctd
+programs are properly installed at your site, the command
+.IP
+.B info nflog-acctd
+.PP
+should give you access to the complete manual.
+.SH CAVEATS
+This manual page is incomplete, and possibly inaccurate.
+.SH AUTHORS
+Hilko Bengen

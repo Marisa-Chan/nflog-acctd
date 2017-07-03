@@ -1,0 +1,200 @@
+nflog-acctd (0.4.4-1)
+  * ULOG replaced with NFLOG
+  * Renamed ulog-acctd to nflog-acctd
+
+ -- Anton Iartsev <llancelot7@gmail.com>  Mon, 03 Jul 2017 13:47:10 +0700
+
+ulog-acctd (0.4.3-2.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Added LSB formatted dependency info in init.d script (closes: #468752)
+  * Support logfile > 2GB (patch by Clément Hermann) (closes: #387109)
+
+ -- Peter Eisentraut <petere@debian.org>  Wed, 02 Apr 2008 01:35:31 +0200
+
+ulog-acctd (0.4.3-2) unstable; urgency=low
+
+  * Actually installed html documentation and fixed the doc-base entry
+    (Closes: #294103 -- this is _so_ embarrasing).
+
+ -- Hilko Bengen <bengen@debian.org>  Mon,  7 Feb 2005 22:56:14 +0100
+
+ulog-acctd (0.4.3-1) unstable; urgency=low
+
+  * New upstream version
+    - Includes patch for "since", thanks to Radek Podgorny
+  * Added HTML documentation to package
+
+ -- Hilko Bengen <bengen@debian.org>  Thu,  3 Feb 2005 23:05:33 +0100
+
+ulog-acctd (0.4.2-1) unstable; urgency=low
+
+  * New upstream version
+    - New hash function, to avoid collision attacks
+  * Updated Standards-Version to 3.6.1
+
+ -- Hilko Bengen <bengen@debian.org>  Mon,  5 Apr 2004 13:30:35 +0200
+
+ulog-acctd (0.4.1-2) unstable; urgency=low
+
+  * Changed maintainer address.
+  * Use delaycompress for logrotate (Closes: #230268)
+
+ -- Hilko Bengen <bengen@debian.org>  Tue,  3 Feb 2004 16:28:09 +0100
+
+ulog-acctd (0.4.1-1) unstable; urgency=low
+
+  * New upstream version
+    - Renaming of dumpfile (if present) didn't work
+
+ -- Hilko Bengen <bengen@debian.org>  Wed,  8 Oct 2003 17:03:47 +0200
+
+ulog-acctd (0.4.0-1) unstable; urgency=low
+
+  * New upstream version
+    - Improvements to lower CPU usage
+
+ -- Hilko Bengen (Debian) <bengen@debian.org>  Tue, 26 Aug 2003 15:58:20 +0200
+
+ulog-acctd (0.3.3-4) unstable; urgency=low
+
+  * Use dpatch for ipt_ULOG.h for arm, m68k. This should fix FTBFS on arm,
+    m68k
+
+ -- Hilko Bengen <bengen+debian@hilluzination.de>  Tue,  6 May 2003 17:36:08 +0200
+
+ulog-acctd (0.3.3-2) unstable; urgency=low
+
+  * dash(1)'s builtin kill does not recognize -SIGFOO. Use kill -FOO 
+    instead. Fixed logrotate script (Thanks to asuffield for pointing this
+    out.)
+  * Included files from contrib/ as examples
+  * Uses DEB_BUILD_OPTIONS now -- increase Standards-Version to 3.5.9
+  * Don't attempt to compile for arm and m68k for now
+  * Removed duplicate entries in debian/dirs
+
+ -- Hilko Bengen <bengen+debian@hilluzination.de>  Sat,  5 Apr 2003 17:54:40 +0200
+
+ulog-acctd (0.3.3-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Hilko Bengen <bengen+debian@hilluzination.de>  Tue,  1 Apr 2003 22:06:46 +0200
+
+ulog-acctd (0.3.2-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Hilko Bengen <bengen+debian@hilluzination.de>  Mon,  3 Mar 2003 02:00:27 +0100
+
+ulog-acctd (0.3.1-1) unstable; urgency=low
+
+  * New upstream version
+  * Includes ipt_ULOG.h (Closes: #172224)
+  * Fixed description (Closes: #168008) (Closes: #168740)
+
+ -- Hilko Bengen <bengen@toplink-plannet.de>  Tue, 17 Dec 2002 14:53:42 +0100
+
+ulog-acctd (0.2.6-2) unstable; urgency=low
+
+  * Fixed typo in description (Closes: #168008)
+  * Bumped Standards-Version
+
+ -- Hilko Bengen <bengen@toplink-plannet.de>  Wed, 13 Nov 2002 00:23:50 +0100
+
+ulog-acctd (0.2.6-1) unstable; urgency=low
+
+  * New upstream version
+    - Logs incoming and outgouing interfaces for short packets
+    - Includes proper config file
+
+ -- Hilko Bengen <bengen@toplink-plannet.de>  Wed, 30 Oct 2002 22:59:38 +0100
+
+ulog-acctd (0.2.5-1) unstable; urgency=low
+
+  * New upstream version
+    - Code to set the kernel receive buffer size for the capturing socket
+      was added.
+    - Added possibility to log short packets.
+
+ -- Hilko Bengen <bengen@toplink-plannet.de>  Thu, 24 Oct 2002 17:24:21 +0200
+
+ulog-acctd (0.2.4-2) unstable; urgency=low
+
+  * Listened to lintian's warnings: included path to copyright, removed
+    debhelper examples.
+  * Changes to logging in process.c, in order to track down wrong min cprange
+  
+ -- Hilko Bengen <bengen@toplink-plannet.de>  Thu, 17 Oct 2002 17:36:22 +0200
+
+ulog-acctd (0.2.4-1) unstable; urgency=low
+
+  * New upstream version
+    - Fixes timewasting behavior.
+    - Accounts packets with short headers whose IP header is complete
+    - Documentation updates
+
+ -- Hilko Bengen <bengen@toplink-plannet.de>  Tue, 15 Oct 2002 14:02:46 +0200
+
+ulog-acctd (0.2.3-1) unstable; urgency=low
+
+  * New upstream version
+    - Smaller signal handler
+    - Fixes problems with rotating logfiles
+
+ -- Hilko Bengen <bengen@toplink-plannet.de>  Sat, 12 Oct 2002 13:37:01 +0200
+
+ulog-acctd (0.2.2-2) unstable; urgency=low
+
+  * fclose/fopen instead of freopen
+
+ -- Hilko Bengen <bengen@toplink-plannet.de>  Thu, 10 Oct 2002 18:53:24 +0200
+
+ulog-acctd (0.2.2-1) unstable; urgency=low
+
+  * New upstream version
+    - Keeps accounting log open all the time
+    - Reopens logs on SIGCONT
+    - Added one statistic value
+
+ -- Hilko Bengen <bengen@toplink-plannet.de>  Thu, 10 Oct 2002 16:19:45 +0200
+
+ulog-acctd (0.2.1-2) unstable; urgency=low
+
+  * Removed unnecessary Depends: texinfo
+
+ -- Hilko Bengen <bengen@toplink-plannet.de>  Wed,  9 Oct 2002 12:30:18 +0200
+
+ulog-acctd (0.2.1-1) unstable; urgency=low
+
+  * New upstream version
+    - Fixes major bug WRT network/host byte order
+
+ -- Hilko Bengen <bengen@toplink-plannet.de>  Tue,  8 Oct 2002 14:20:35 +0200
+
+ulog-acctd (0.2-2) unstable; urgency=low
+
+  * Added statistics output of "truncated message".
+
+ -- Hilko Bengen <bengen@vdst-ka.inka.de>  Fri, 27 Sep 2002 13:39:39 +0200
+
+ulog-acctd (0.2-1) unstable; urgency=low
+
+  * New upstream version.
+    - Added "empty interface" option
+    - Added logging of ULOG prefix and "empty prefix" option
+    - Removed memory leak
+    
+ -- Hilko Bengen <bengen@toplink-plannet.de>  Thu, 26 Sep 2002 17:29:10 +0200
+
+ulog-acctd (0.1-2) unstable; urgency=low
+
+  * Added missing texinfo build dependency
+
+ -- Hilko Bengen <bengen@toplink-plannet.de>  Wed, 25 Sep 2002 18:05:22 +0200
+
+ulog-acctd (0.1-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Hilko Bengen <bengen@toplink-plannet.de>  Fri, 20 Sep 2002 16:27:25 +0200
