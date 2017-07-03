@@ -244,7 +244,7 @@ Explaination:
 place.
 @item
 @option{--nflog-group @var{GROUP}} specifies thet the packet be sent to
-multicast group @var{GROUP}. @command{nflog-acctd} has to be configured
+nflog group @var{GROUP}. @command{nflog-acctd} has to be configured
 to listen to this group.
 @item
 @option{--nflog-range @var{SIZE}} means that only the first @var{SIZE}
@@ -278,9 +278,8 @@ Per default, configuration is done via the file
 
 @itemize
 @item
-@command{multicast groups = @var{LIST}}: @var{LIST} is a comma-separated
-list of multicast groups that @command{nflog-acctd} should listen to. Possible
-values are 1-32.
+@command{nflog group = @var{VALUE}}: Is a group that @command{nflog-acctd} 
+should listen to. Possible values are 0 - 2^16-1.
 @item
 @command{socket receive buffer = @var{SIZE}}: The kernel's socket
 receive buffer will be set to @var{SIZE} bytes instead of the
@@ -394,7 +393,7 @@ traffic
 Example:
 @example
 @verbatim
-multicast groups=1
+nflog group=1
 accounting file = /var/log/nflog-acctd/account.log
 dump file =       /var/log/nflog-acctd/dump
 debug file =      /var/log/nflog-acctd/debug.log
