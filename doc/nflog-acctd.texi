@@ -278,8 +278,9 @@ Per default, configuration is done via the file
 
 @itemize
 @item
-@command{nflog group = @var{VALUE}}: Is a group that @command{nflog-acctd} 
-should listen to. Possible values are 0 - 2^16-1.
+@command{nflog group = @var{LIST}}: @var{LIST} is a comma-separated list
+of NFLOG groups that @command{nflog-acctd} should listen to. Possible
+values are 0 - 2^16-1.
 @item
 @command{socket receive buffer = @var{SIZE}}: The kernel's socket
 receive buffer will be set to @var{SIZE} bytes instead of the

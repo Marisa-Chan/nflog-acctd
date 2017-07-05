@@ -52,7 +52,7 @@
 #include <libnetfilter_log/libnetfilter_log.h>
 
 struct nflog_handle *nful_h = NULL;
-struct nflog_g_handle* nful_gh = NULL;
+struct nflog_g_handle* nful_gh[CFG_MAX_GROUPS];
 int nful_fd = -1;
 size_t recvbufsiz = 0;
 size_t nlbufsiz = 0;
@@ -137,15 +137,26 @@ void init_capture()
       daemon_stop(0);
     }
     
+    
   /* bind to NFLOG target group */
-  nful_gh = nflog_bind_group(nful_h, cfg->mcast_group);
-  if (!nful_gh) 
+  
+  int i;
+  for (i = 0; i < CFG_MAX_GROUPS; i++)
     {
-      DEBUG(DBG_ERR, my_sprintf("can't bind to group %d: %m",cfg->mcast_group));
-      daemon_stop(0);
-    }
+      nful_gh[i] = NULL;
+      
+      if (cfg->mcast_group[i] >= 0)
+        {
+          nful_gh[i] = nflog_bind_group(nful_h, cfg->mcast_group[i]);
+          if (!nful_gh[i]) 
+            {
+	      DEBUG(DBG_ERR, my_sprintf("can't bind to group %d: %m",cfg->mcast_group[i]));
+            }
 
-  nflog_set_mode(nful_gh, NFULNL_COPY_PACKET, 0xffff);
+          nflog_set_mode(nful_gh[i], NFULNL_COPY_PACKET, 0xffff);
+          nflog_callback_register(nful_gh[i], &msg_cb, NULL);
+	}
+    }
 
   /* Set receive buffer size if requested. */
   if (cfg->buffsz) 
@@ -165,10 +176,6 @@ void init_capture()
     {
       setnlbufsiz(cfg->so_rcvbuf);
     }
-    
-  //nlbufsiz = nfnl_rcvbufsiz(nflog_nfnlh(nful_h), nlbufsiz);
-  
-  nflog_callback_register(nful_gh, &msg_cb, NULL);
   
   nful_fd = nflog_fd(nful_h);
   
@@ -188,10 +195,16 @@ void exit_capture(void)
 {
   nful_fd = -1;
   
-  if (nful_gh)
+  int i;
+  for (i = 0; i < CFG_MAX_GROUPS; i++)
     {
-      nflog_unbind_group(nful_gh);
-      nful_gh = NULL;
+      nful_gh[i] = NULL;
+      
+      if (nful_gh[i])
+        {
+	  nflog_unbind_group(nful_gh[i]);
+          nful_gh[i] = NULL;
+	}
     }
   
   if (nful_h)

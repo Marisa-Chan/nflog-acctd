@@ -7,6 +7,8 @@
   $Id: config.h,v 1.13 2004/04/06 08:49:35 bengen Exp $
 */
 
+#define CFG_MAX_GROUPS 128
+
 struct config
 {
   char *acct_file;
@@ -18,7 +20,7 @@ struct config
   int flush; /* in seconds */
   int fdelay; /* in seconds */
   int err_delay; /* how many cycles to delay on error ? */
-  int mcast_group;
+  int mcast_group[CFG_MAX_GROUPS];
   int output, debug; /* bitmasks */
   size_t so_rcvbuf;
   size_t so_rcvbuf_max;

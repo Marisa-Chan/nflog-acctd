@@ -64,7 +64,8 @@ struct config *read_config(char *fname)
   cfg->flush = DEFAULT_FLUSH;
   cfg->fdelay = DEFAULT_FDELAY;
   cfg->err_delay = DEFAULT_ERR_DELAY;
-  cfg->mcast_group = 0;
+  for(i = 0; i < CFG_MAX_GROUPS; i++)
+	cfg->mcast_group[i] = -1;
   cfg->debug = 0;
   cfg->so_rcvbuf = 0;
   cfg->so_rcvbuf_max = 0;
@@ -297,8 +298,15 @@ struct config *read_config(char *fname)
 	}
       else if(strcasecmp(key, "nflog group")==0)
 	{
-	  cfg->mcast_group = atoi(value);
-	  syslog(LOG_DEBUG,"config: set nflog group to %d",cfg->mcast_group);
+	  i = 0;
+	  tmpc=value;
+          while((value=strtok(tmpc,",")) != NULL && i < CFG_MAX_GROUPS)
+            {
+              cfg->mcast_group[i] = atoi(value);
+	      i++;
+              syslog(LOG_DEBUG,"config: adding nflog group %u",atoi(value));
+	      tmpc=NULL;
+            }
 	}
       else if (strcasecmp(key, "empty interface")==0)
 	{

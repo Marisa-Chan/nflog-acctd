@@ -14,6 +14,3 @@ nflog-acctd is a fork of ulog-acctd.
 - init.d script
 - logrotate script
 
-
-**Limitations**:
-- Only one NFLOG group can be setted
