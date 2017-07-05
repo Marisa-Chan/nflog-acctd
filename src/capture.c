@@ -48,16 +48,15 @@
 
 /* For parsing nflog packets */
 #include <net/if.h>
+#include <libnfnetlink/libnfnetlink.h>
 #include <libnetfilter_log/libnetfilter_log.h>
-
-/* Size of the receive buffer for the netlink socket.  Should be at least of
- * RMEM_DEFAULT size.  */
-#define NFLOG_BUFSIZE_DEFAULT	150000
 
 struct nflog_handle *nful_h = NULL;
 struct nflog_g_handle* nful_gh = NULL;
 int nful_fd = -1;
-int nlbufsiz = 0;
+size_t recvbufsiz = 0;
+size_t nlbufsiz = 0;
+size_t nlmaxbufsiz = 0;
 unsigned char *nfulog_buf = NULL;
 
 int nful_overrun_warned = 0;
@@ -65,6 +64,21 @@ int nful_overrun_warned = 0;
 extern struct statistics* stats;
 
 unsigned char nullmac[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+static int setnlbufsiz(int size)
+{
+	if (size < nlmaxbufsiz) {
+		nlbufsiz = nfnl_rcvbufsiz(nflog_nfnlh(nful_h), size);
+		return 1;
+	}
+
+	DEBUG(DBG_ERR, my_sprintf("Maximum buffer size (%d) in NFLOG has been "
+				"reached. Please, consider rising "
+				"`netlink_socket_buffer_size` and "
+				"`netlink_socket_buffer_maxsize` "
+				"clauses.: %m", nlbufsiz));
+	return 0;
+}
 
 static int msg_cb(struct nflog_g_handle *gh, struct nfgenmsg *nfmsg, struct nflog_data *nfa, void *data)
 {
@@ -132,16 +146,25 @@ void init_capture()
   nflog_set_mode(nful_gh, NFULNL_COPY_PACKET, 0xffff);
 
   /* Set receive buffer size if requested. */
-  if (cfg->so_rcvbuf) 
+  if (cfg->buffsz) 
     {
-      nlbufsiz = cfg->so_rcvbuf;
+      recvbufsiz = cfg->buffsz;
     }
     else
     {
-      nlbufsiz = NFLOG_BUFSIZE_DEFAULT;
+      recvbufsiz = NFLOG_BUFSIZE_DEFAULT;
     }
   
-  nfulog_buf = malloc(nlbufsiz);
+  nfulog_buf = malloc(recvbufsiz);
+  
+  nlmaxbufsiz = cfg->so_rcvbuf_max;
+  
+  if (cfg->so_rcvbuf)
+    {
+      setnlbufsiz(cfg->so_rcvbuf);
+      DEBUG(DBG_ANNOYING, my_sprintf("NFLOG netlink buffer size has been "
+					"set to %d", nlbufsiz));
+    }
     
   //nlbufsiz = nfnl_rcvbufsiz(nflog_nfnlh(nful_h), nlbufsiz);
   
@@ -290,26 +313,49 @@ void packet_loop()
       
 	if (ret<0)
 	  {
-	    if (errno!=EINTR) {
-	      DEBUG(DBG_ERR, my_sprintf("select(): %m"));
-	    }
-	    continue;
+	    if (errno!=EINTR) 
+	      {
+	        DEBUG(DBG_ERR, my_sprintf("select(): %m"));
+	      }
 	  }
 	else if (ret>0)
 	  {
 	    int len;
 	    
-	    len = recv(nful_fd, nfulog_buf, nlbufsiz, 0);
+	    len = recv(nful_fd, nfulog_buf, recvbufsiz, 0);
 	    
-	    if (len < 0) {
-	      if (errno == ENOBUFS && !nful_overrun_warned) {
-		    DEBUG(DBG_ERR, my_sprintf(
+	    if (len < 0) 
+	      {
+	        if (errno == ENOBUFS && !nful_overrun_warned) 
+		  {
+		    if (nlmaxbufsiz)
+		      {
+		        int newsize = nlbufsiz * 2;
+			if (setnlbufsiz(newsize))
+			  {
+			    DEBUG(DBG_ANNOYING, my_sprintf(
+			        "We are losing events, "
+				"increasing buffer size "
+				"to %d", nlbufsiz));
+			  }
+			else
+			  {
+			    DEBUG(DBG_ERR, my_sprintf(
+				"Maximal socket buffer size reached. "
+				"We are losing events.: %m"));
+			    nful_overrun_warned = 1;
+			  }
+		      }
+		    else
+		      {
+		        DEBUG(DBG_ERR, my_sprintf(
 				"We are losing events. Please, "
 				"consider using the clauses "
 				"`netlink_socket_buffer_size' and "
 				"`netlink_socket_buffer_maxsize': %m"));
-		    nful_overrun_warned = 1;
-		}
+			nful_overrun_warned = 1;
+		      }
+		  }
 	      }
 	    else
 	      nflog_handle_packet(nful_h, (char *)nfulog_buf, len);

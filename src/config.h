@@ -21,12 +21,14 @@ struct config
   int mcast_group;
   int output, debug; /* bitmasks */
   size_t so_rcvbuf;
+  size_t so_rcvbuf_max;
   unsigned int hash_table_size;
   unsigned int hash_mask;
   unsigned int hash_initval;
   int logger_nice_value;
   char empty_iface[32];
   char empty_prefix[32];
+  size_t buffsz;
 };
 
 extern struct config *cfg; 
@@ -46,6 +48,10 @@ extern char *fname;
 #define DEFAULT_FDELAY 60
 
 #define FORCE_STAT_TIME 5
+
+/* Size of the receive buffer for the netlink socket.  Should be at least of
+ * RMEM_DEFAULT size.  */
+#define NFLOG_BUFSIZE_DEFAULT	150000
 
 #define VERSION "0.4.4"
 

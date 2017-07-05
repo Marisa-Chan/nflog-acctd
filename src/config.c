@@ -66,7 +66,9 @@ struct config *read_config(char *fname)
   cfg->err_delay = DEFAULT_ERR_DELAY;
   cfg->mcast_group = 0;
   cfg->debug = 0;
-  cfg->so_rcvbuf = 65536;
+  cfg->so_rcvbuf = 0;
+  cfg->so_rcvbuf_max = 0;
+  cfg->buffsz = NFLOG_BUFSIZE_DEFAULT;
   cfg->hash_table_size = 65536; cfg->hash_mask = 0xffff; cfg->hash_initval = 0;
   cfg->logger_nice_value = 0;
   *(cfg->empty_iface) = '\0';
@@ -366,6 +368,16 @@ struct config *read_config(char *fname)
 	{
 	  cfg->so_rcvbuf = atoi(value);
 	  syslog(LOG_DEBUG,"config: set socket receive buffer to %zu",cfg->so_rcvbuf);
+	}
+      else if(strcasecmp(key, "max socket receive buffer")==0)
+	{
+	  cfg->so_rcvbuf_max = atoi(value);
+	  syslog(LOG_DEBUG,"config: set socket receive buffer max to %zu",cfg->so_rcvbuf_max);
+	}
+      else if(strcasecmp(key, "receive buffer size")==0)
+	{
+	  cfg->buffsz = atoi(value);
+	  syslog(LOG_DEBUG,"config: set receive buffer to %zu",cfg->buffsz);
 	}
       else if (strcasecmp(key, "hash table size")==0)
 	{
