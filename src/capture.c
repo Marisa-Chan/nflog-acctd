@@ -69,6 +69,8 @@ static int setnlbufsiz(int size)
 {
 	if (size < nlmaxbufsiz) {
 		nlbufsiz = nfnl_rcvbufsiz(nflog_nfnlh(nful_h), size);
+		DEBUG(DBG_MISC, my_sprintf("NFLOG socket buffer size has been "
+					"set to %d (%d requested)", nlbufsiz, size));
 		return 1;
 	}
 
@@ -162,8 +164,6 @@ void init_capture()
   if (cfg->so_rcvbuf)
     {
       setnlbufsiz(cfg->so_rcvbuf);
-      DEBUG(DBG_MISC, my_sprintf("NFLOG netlink buffer size has been "
-					"set to %d", nlbufsiz));
     }
     
   //nlbufsiz = nfnl_rcvbufsiz(nflog_nfnlh(nful_h), nlbufsiz);
