@@ -162,7 +162,7 @@ void init_capture()
   if (cfg->so_rcvbuf)
     {
       setnlbufsiz(cfg->so_rcvbuf);
-      DEBUG(DBG_ANNOYING, my_sprintf("NFLOG netlink buffer size has been "
+      DEBUG(DBG_MISC, my_sprintf("NFLOG netlink buffer size has been "
 					"set to %d", nlbufsiz));
     }
     
@@ -333,7 +333,7 @@ void packet_loop()
 		        int newsize = nlbufsiz * 2;
 			if (setnlbufsiz(newsize))
 			  {
-			    DEBUG(DBG_ANNOYING, my_sprintf(
+			    DEBUG(DBG_MISC, my_sprintf(
 			        "We are losing events, "
 				"increasing buffer size "
 				"to %d", nlbufsiz));
