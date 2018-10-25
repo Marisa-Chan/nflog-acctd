@@ -9,6 +9,7 @@
 
 #include <sys/time.h>
 #include <sys/types.h>
+#include <inttypes.h>
 
 /* Output record format */
 #define OUT_TIMESTAMP 0
@@ -33,23 +34,23 @@
 
 struct statistics
 {
-  unsigned long int ipv4;
+  uint64_t ipv4;
   /* IPv4 protocol types: Sum should be equal to ipv4 */
-  unsigned long int ipv4_udp, ipv4_tcp, ipv4_icmp, ipv4_other;
+  uint64_t ipv4_udp, ipv4_tcp, ipv4_icmp, ipv4_other;
   /* errors */
-  unsigned long int dropped, ipv4_short, nl_truncated, nl_recv_error;
-  unsigned long int list_compares, list_lookups, unknown_user;
+  uint64_t dropped, ipv4_short, nl_truncated, nl_recv_error;
+  uint64_t list_compares, list_lookups, unknown_user;
   /* diagnostics */
-  unsigned int min_cprange;
+  uint32_t min_cprange;
 };
 
 struct ipv4data
 {
-  u_int8_t proto;
-  u_int32_t src, dst;
-  u_int16_t srcport, dstport;
-  unsigned long int bytes;
-  unsigned long int count;
+  uint8_t proto;
+  uint32_t src, dst;
+  uint16_t srcport, dstport;
+  uint64_t bytes;
+  uint64_t count;
   char *indev, *outdev, *prefix;
   uid_t local_uid;
   time_t since, when;
@@ -60,8 +61,8 @@ struct ipv4data
 
 struct localuiddata
 {
-  u_int32_t localaddr, remoteaddr;
-  u_int16_t localport, remoteport;
+  uint32_t localaddr, remoteaddr;
+  uint16_t localport, remoteport;
   uid_t uid;
   struct localuiddata *next;
 };

@@ -62,8 +62,8 @@ static struct ipv4data **plist;
 
 static struct ipv4data *output_list;
 
-unsigned long int plistsize;
-unsigned long int olistsize;
+uint64_t plistsize;
+uint64_t olistsize;
 
 static volatile sig_atomic_t lck;
 /* static volatile sig_atomic_t writing; */
@@ -128,9 +128,9 @@ void reopen_socket(void)
   init_capture();
   
   lck = save2;
-  
-  DEBUG(DBG_STATE, my_sprintf("reopen_socket [after]: lck = %d",save2)); 
-  
+
+  DEBUG(DBG_STATE, my_sprintf("reopen_socket [after]: lck = %d",save2));
+
   sigflag_may_write = save1;
 }
 
@@ -588,7 +588,7 @@ void write_list(void)
 
   unlink(tmpn);
 
-  DEBUG(DBG_STATE, my_sprintf("* write finished, count = %ld", olistsize));
+  DEBUG(DBG_STATE, my_sprintf("* write finished, count = %"PRIu64, olistsize));
 
   exit(0);
 }
@@ -653,7 +653,7 @@ void dump_curr_list(void)
 
   unlink(tmpn);
 
-  DEBUG(DBG_STATE, my_sprintf("* dump finished, count = %ld", plistsize));
+  DEBUG(DBG_STATE, my_sprintf("* dump finished, count = %"PRIu64, plistsize));
 
   exit(0);
 }
@@ -823,9 +823,9 @@ int write_log(int force)
   else
     /* Go ahead. Write. */
     {
-      DEBUG(DBG_STATISTICS, my_sprintf("IPv4: %ld (UDP: %ld TCP: %ld ICMP: %ld other: %ld) short: %ld", stats->ipv4, stats->ipv4_udp, stats->ipv4_tcp, stats->ipv4_icmp, stats->ipv4_other, stats->ipv4_short));
-      DEBUG(DBG_STATISTICS, my_sprintf("min cprange: %d drop: %ld nlmsg trunc: %ld  recv err: %ld", stats->min_cprange, stats->dropped, stats->nl_truncated, stats->nl_recv_error));
-      DEBUG(DBG_STATISTICS, my_sprintf("lookups: %d, compares: %d, c/l: %f", stats->list_lookups, stats->list_compares, ((float) stats->list_compares / (float) stats->list_lookups)));
+      DEBUG(DBG_STATISTICS, my_sprintf("IPv4: %"PRIu64" (UDP: %"PRIu64" TCP: %"PRIu64" ICMP: %"PRIu64" other: %"PRIu64") short: %"PRIu64, stats->ipv4, stats->ipv4_udp, stats->ipv4_tcp, stats->ipv4_icmp, stats->ipv4_other, stats->ipv4_short));
+      DEBUG(DBG_STATISTICS, my_sprintf("min cprange: %d drop: %"PRIu64" nlmsg trunc: %"PRIu64"  recv err: %"PRIu64, stats->min_cprange, stats->dropped, stats->nl_truncated, stats->nl_recv_error));
+      DEBUG(DBG_STATISTICS, my_sprintf("lookups: %"PRIu64", compares: %"PRIu64", c/l: %f", stats->list_lookups, stats->list_compares, ((float) stats->list_compares / (float) stats->list_lookups)));
 
       /* Update global stats, reset per-run stats */
       stats0->ipv4+=stats->ipv4;
@@ -847,16 +847,16 @@ int write_log(int force)
       if (force)
 	{
 	  DEBUG(DBG_STATISTICS, "Since start of daemon:");
-	  DEBUG(DBG_STATISTICS, my_sprintf("IPv4: %ld (UDP: %ld TCP: %ld ICMP: %ld other: %ld) short: %ld", stats0->ipv4, stats0->ipv4_udp, stats0->ipv4_tcp, stats0->ipv4_icmp, stats0->ipv4_other, stats0->ipv4_short));
-	  DEBUG(DBG_STATISTICS, my_sprintf("min cprange: %d drop: %ld nlmsg trunc: %ld  recv err: %ld", stats0->min_cprange, stats0->dropped, stats0->nl_truncated, stats0->nl_recv_error));
-	  DEBUG(DBG_STATISTICS, my_sprintf("lookups: %d, compares: %d, c/l: %f", stats0->list_lookups, stats0->list_compares, ((float) stats0->list_compares / (float) stats0->list_lookups)));
+	  DEBUG(DBG_STATISTICS, my_sprintf("IPv4: %"PRIu64" (UDP: %"PRIu64" TCP: %"PRIu64" ICMP: %"PRIu64" other: %"PRIu64") short: %"PRIu64, stats0->ipv4, stats0->ipv4_udp, stats0->ipv4_tcp, stats0->ipv4_icmp, stats0->ipv4_other, stats0->ipv4_short));
+	  DEBUG(DBG_STATISTICS, my_sprintf("min cprange: %d drop: %"PRIu64" nlmsg trunc: %"PRIu64"  recv err: %"PRIu64, stats0->min_cprange, stats0->dropped, stats0->nl_truncated, stats0->nl_recv_error));
+	  DEBUG(DBG_STATISTICS, my_sprintf("lookups: %"PRIu64", compares: %"PRIu64", c/l: %f", stats0->list_lookups, stats0->list_compares, ((float) stats0->list_compares / (float) stats0->list_lookups)));
 	}
 
       DEBUG(DBG_STATE, "lck = 1");
       lck = 1; /* can't update the list now */
-      
-      DEBUG(DBG_MISC, my_sprintf("Total of %ld entries", plistsize));
-      
+
+      DEBUG(DBG_MISC, my_sprintf("Total of %"PRIu64" entries", plistsize));
+
       /* 
 	 We build two lists:
 	 1) output_list, which will be written out
@@ -894,7 +894,7 @@ int write_log(int force)
 	 plist[i] = tmp_list;
       }
 
-      DEBUG(DBG_MISC, my_sprintf("Split into %ld [hold] and %ld [write] = %ld [total] entries", plistsize, olistsize, plistsize + olistsize)); 
+      DEBUG(DBG_MISC, my_sprintf("Split into %"PRIu64" [hold] and %"PRIu64" [write] = %"PRIu64" [total] entries", plistsize, olistsize, plistsize + olistsize));
 
       /* Output list and new plist have been built. */
 
