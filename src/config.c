@@ -164,12 +164,12 @@ struct config *read_config(char *fname)
 		    case 'P':
 		      cfg->output|=(1<<OUT_PACKETS);
 		      strcpy(tmpc,"%8$" PRIu64);
-		      tmpc+=4;
+		      tmpc+=strlen("%8$" PRIu64);
 		      break;
 		    case 'b':
 		      cfg->output|=(1<<OUT_BYTES);
 		      strcpy(tmpc,"%9$" PRIu64);
-		      tmpc+=5;
+		      tmpc+=strlen("%9$" PRIu64);
 		      break;
 		    case 'i':
 		      cfg->output|=(1<<OUT_INDEV);
